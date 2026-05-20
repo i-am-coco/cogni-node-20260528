@@ -28,7 +28,6 @@
 # Those belong in infra/catalog/<node>.yaml.
 
 schema_version: 1
-
 fork:
   # Repo/fork-level slug for account-scoped infra aliases. This is NOT a
   # node slug: a multi-node repo still shares one VM substrate per env.
@@ -39,10 +38,9 @@ fork:
   #   preview:     <slug>-preview.vm.<domain.root>
   #   production:  <slug>.vm.<domain.root>
   slug: ""
-
 domain:
   # The Cloudflare zone the operator owns. Public URLs compose as
   # `https://<catalog-prefix>.<root>` (or `https://<root>` if catalog
   # prefix is empty, e.g. production at the apex). Must match the zone
   # named by .env.bootstrap::CLOUDFLARE_ZONE_ID.
-  root: "" # auto-populated by pnpm bootstrap from CLOUDFLARE_ZONE_ID
+  root: "opencompany.cc" # auto-populated by pnpm bootstrap from CLOUDFLARE_ZONE_ID
