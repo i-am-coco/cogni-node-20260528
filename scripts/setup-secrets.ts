@@ -556,15 +556,28 @@ const SECRETS: Secret[] = [
     category: "Observability (Grafana Cloud)",
     source: "human",
     description:
-      "Grafana service account token for observability reads and reproducible datasource provisioning",
+      "Grafana child SA token (Viewer role, read-only). Auto-minted by Phase 5e when GH_GRAFANA_PARENT_SA_TOKEN + GH_GRAFANA_URL are set at Step 6.2. This entry is the break-glass manual override path.",
     steps: [
-      "Grafana instance",
-      "Administration -> Service Accounts",
-      "Add service account with datasource read/query plus datasource create/write for setup runs",
-      "Required permissions: datasources:read, datasources:query, datasources:create, datasources:write",
-      "Use a stack service-account token, usually prefixed glsa_; Grafana Cloud access-policy tokens prefixed glc_ do not authorize the Grafana instance HTTP API",
-      "Use Grafana Cloud Private Data Source Connect (PDC) for private databases; do not expose Postgres publicly",
-      "Add token, copy it",
+      "Preferred: set GH_GRAFANA_PARENT_SA_TOKEN + GH_GRAFANA_URL at Step 6.2 — Phase 5e mints a per-env Viewer SA + token and seeds this key to cogni/<env>/_shared automatically.",
+      "Manual override (break-glass): mint your own glsa_ token in Grafana > Administration > Service accounts. Required permissions: datasources:read, datasources:query (Viewer role is sufficient).",
+      "Use a stack service-account token (glsa_ prefix); access-policy tokens (glc_) do NOT authorize the Grafana instance HTTP API.",
+    ],
+  },
+  {
+    name: "GRAFANA_PARENT_SA_TOKEN",
+    required: false,
+    category: "Observability (Grafana Cloud)",
+    source: "human",
+    description:
+      "Parent Grafana stack SA token (Admin role, write scope). Bootstrap Phase 5e uses this once per env to mint a per-env Viewer child SA + token via POST /api/serviceaccounts. Lives only as a GH-env-secret; never written to OpenBao, never propagated to pods, never reaches the VM. See docs/design/observability-creds-shared.md.",
+    url: "https://grafana.com/orgs",
+    steps: [
+      "Open your Grafana stack UI > Administration > Users and access > Service accounts.",
+      "Add service account named e.g. 'cogni-bootstrap-minter' with role 'Admin' (Admin is required for serviceaccounts:write + serviceaccounts.tokens:write).",
+      "Open the new SA > Add service account token (no expiry is fine; rotate later via the same UI).",
+      "Copy the glsa_ value when shown — Grafana only displays it once.",
+      "MUST be a stack SA token (glsa_ prefix). Cloud access-policy tokens (glc_) do NOT authorize POST /api/serviceaccounts; Phase 5e preflight rejects them with a clear error.",
+      "Skip this secret to leave observability auto-wire disabled (scorecard row 5 stays 🟡, bootstrap still completes).",
     ],
   },
   {
@@ -659,7 +672,8 @@ const SECRETS: Secret[] = [
     required: false,
     category: "Observability (Grafana Cloud)",
     source: "human",
-    description: "Grafana Cloud API key (logs:write scope)",
+    description:
+      "Grafana Cloud API key (logs:write scope) — for Alloy push to Loki",
     url: "https://grafana.com/orgs",
     steps: [
       "Access Policies -> Create policy",
