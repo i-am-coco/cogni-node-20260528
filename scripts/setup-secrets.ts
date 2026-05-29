@@ -556,27 +556,27 @@ const SECRETS: Secret[] = [
     category: "Observability (Grafana Cloud)",
     source: "human",
     description:
-      "Grafana child SA token (Viewer role, read-only). Auto-minted by Phase 5e when GH_GRAFANA_PARENT_SA_TOKEN + GH_GRAFANA_URL are set at Step 6.2. This entry is the break-glass manual override path.",
+      "Grafana child SA token (Viewer role, read-only). Auto-minted by Phase 5e when GH_GRAFANA_CLOUD_ADMIN_TOKEN + GH_GRAFANA_URL are set at Step 6.2. This entry is the break-glass manual override path.",
     steps: [
-      "Preferred: set GH_GRAFANA_PARENT_SA_TOKEN + GH_GRAFANA_URL at Step 6.2 — Phase 5e mints a per-env Viewer SA + token and seeds this key to cogni/<env>/_shared automatically.",
+      "Preferred: set GH_GRAFANA_CLOUD_ADMIN_TOKEN + GH_GRAFANA_URL at Step 6.2 — Phase 5e derives a Viewer child SA + token from your Cloud admin root and seeds this key to cogni/<env>/_shared automatically.",
       "Manual override (break-glass): mint your own glsa_ token in Grafana > Administration > Service accounts. Required permissions: datasources:read, datasources:query (Viewer role is sufficient).",
       "Use a stack service-account token (glsa_ prefix); access-policy tokens (glc_) do NOT authorize the Grafana instance HTTP API.",
     ],
   },
   {
-    name: "GRAFANA_PARENT_SA_TOKEN",
+    name: "GRAFANA_CLOUD_ADMIN_TOKEN",
     required: false,
     category: "Observability (Grafana Cloud)",
     source: "human",
     description:
-      "Parent Grafana stack SA token (Admin role, write scope). Bootstrap Phase 5e uses this once per env to mint a per-env Viewer child SA + token via POST /api/serviceaccounts. Lives only as a GH-env-secret; never written to OpenBao, never propagated to pods, never reaches the VM. See docs/design/observability-creds-shared.md.",
+      "Single Grafana Cloud admin access-policy token (glc_*). Phase 5e derives BOTH the read-path child SA token AND the write-path Loki/Prom push token from this one root. Lives only as a GH-env-secret; never written to OpenBao, never propagated to pods, never reaches the VM. See docs/design/observability-creds-shared.md.",
     url: "https://grafana.com/orgs",
     steps: [
-      "Open your Grafana stack UI > Administration > Users and access > Service accounts.",
-      "Add service account named e.g. 'cogni-bootstrap-minter' with role 'Admin' (Admin is required for serviceaccounts:write + serviceaccounts.tokens:write).",
-      "Open the new SA > Add service account token (no expiry is fine; rotate later via the same UI).",
-      "Copy the glsa_ value when shown — Grafana only displays it once.",
-      "MUST be a stack SA token (glsa_ prefix). Cloud access-policy tokens (glc_) do NOT authorize POST /api/serviceaccounts; Phase 5e preflight rejects them with a clear error.",
+      "Open https://grafana.com/orgs/<your-org>/access-policies (Cloud portal, NOT the stack UI).",
+      "Create access policy named e.g. 'cogni-bootstrap-admin' with realm = your org.",
+      "Add ALL FOUR scopes: stacks:read, stack-service-accounts:write, accesspolicies:read, accesspolicies:write.",
+      "Create token under that policy, copy the glc_ value (shown once).",
+      "MUST be a glc_ access-policy token. Stack SA tokens (glsa_) cannot mint Cloud access-policies; bearer tokens (glb_) are not supported. Phase 5e preflight rejects either with a clear error.",
       "Skip this secret to leave observability auto-wire disabled (scorecard row 5 stays 🟡, bootstrap still completes).",
     ],
   },
@@ -673,12 +673,11 @@ const SECRETS: Secret[] = [
     category: "Observability (Grafana Cloud)",
     source: "human",
     description:
-      "Grafana Cloud API key (logs:write scope) — for Alloy push to Loki",
+      "Grafana Cloud API key (logs:write scope) for Alloy push to Loki. Auto-minted by Phase 5e (lands at cogni/<env>/_shared/LOKI_PASSWORD) when GH_GRAFANA_CLOUD_ADMIN_TOKEN + GH_GRAFANA_URL are set at Step 6.2. This entry is the break-glass manual override path.",
     url: "https://grafana.com/orgs",
     steps: [
-      "Access Policies -> Create policy",
-      "Scope: logs:write",
-      "Create token, copy it",
+      "Preferred: set GH_GRAFANA_CLOUD_ADMIN_TOKEN at Step 6.2 — Phase 5e mints a glc_ push token (logs:write + metrics:write + logs:read + metrics:read) and seeds both LOKI_PASSWORD and PROMETHEUS_PASSWORD from it.",
+      "Manual override: Access Policies -> Create policy -> Scope logs:write -> Create token, copy it.",
     ],
   },
   {
@@ -704,12 +703,12 @@ const SECRETS: Secret[] = [
     required: false,
     category: "Observability (Grafana Cloud)",
     source: "human",
-    description: "Grafana Cloud API key (metrics:write scope)",
+    description:
+      "Grafana Cloud API key (metrics:write scope). Auto-minted by Phase 5e (same glc_ token as LOKI_PASSWORD — single 4-scope policy) when GH_GRAFANA_CLOUD_ADMIN_TOKEN + GH_GRAFANA_URL are set at Step 6.2. This entry is the break-glass manual override path.",
     url: "https://grafana.com/orgs",
     steps: [
-      "Access Policies -> Create policy",
-      "Scope: metrics:write",
-      "Create token, copy it",
+      "Preferred: set GH_GRAFANA_CLOUD_ADMIN_TOKEN at Step 6.2 — Phase 5e seeds this from the auto-minted push policy.",
+      "Manual override: Access Policies -> Create policy -> Scope metrics:write -> Create token, copy it.",
     ],
   },
   {
