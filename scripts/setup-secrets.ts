@@ -200,27 +200,28 @@ const SECRETS: Secret[] = [
   },
   {
     name: "EVM_RPC_URL",
-    required: true,
+    required: false,
     category: "Core App",
     source: "human",
-    description: "Base mainnet RPC endpoint for on-chain verification",
+    description:
+      "Base mainnet RPC endpoint for on-chain verification. OPTIONAL for node-template's baseline feature set; only required by features that perform on-chain reads. Was historically marked required: true at the scripts/setup-secrets.ts level and hard-checked in deploy-infra.sh; both relaxed because fresh-fork bootstrap doesn't supply it and shouldn't hard-fail without it.",
     url: "https://dashboard.alchemy.com/",
     steps: [
-      "Create a new app (chain: Base mainnet)",
-      "Copy the full HTTPS URL including API key",
+      "Skip unless your fork enables on-chain features.",
+      "If needed: create an Alchemy app on Base mainnet, copy the full HTTPS URL including API key.",
     ],
   },
   {
     name: "POLYGON_RPC_URL",
-    required: true,
+    required: false,
     category: "Polymarket / RPC",
     source: "human",
-    description: "Polygon mainnet RPC endpoint for poly runtime reads",
+    description:
+      "Polygon mainnet RPC endpoint — POLY-SPECIFIC, not used by node-template's baseline feature set. Present in the catalog only so downstream forks (cogni-poly) can pass it through without re-declaring. node-template forks should leave this blank.",
     url: "https://dashboard.alchemy.com/",
     steps: [
-      "Create a new app (chain: Polygon mainnet)",
-      "Copy the full HTTPS URL including API key",
-      "Used by poly-node for Polygon balances / allowance reads",
+      "Skip — node-template has no polygon-using code.",
+      "Downstream (cogni-poly) forks: create an Alchemy app on Polygon mainnet, copy the full HTTPS URL.",
     ],
   },
   {
