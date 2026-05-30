@@ -25,6 +25,11 @@ patches:
       - op: replace
         path: /data/IMAGE_DIGEST
         value: "candidate-a-placeholder-scheduler-worker"
+      # Hotfix: the bootstrap image currently bakes upstream's repo-spec into
+      # /app/.cogni, so node-app submits graph work to this per-node queue.
+      - op: replace
+        path: /data/COGNI_NODE_ENDPOINTS
+        value: "operator=http://node-app:3000,node-template=http://node-app:3000,4ff8eac1-4eba-4ed0-931b-b1fe4f64713d=http://node-app:3000"
 
   # bug.0295: VM discovery via DNS (candidate-a.vm.cognidao.org).
   # Convert base headless Services → ExternalName; delete EndpointSlices.
