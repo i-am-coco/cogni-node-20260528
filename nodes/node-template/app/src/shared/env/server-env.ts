@@ -198,6 +198,11 @@ export const serverSchema = z.object({
   // Required for research graph web search capability
   TAVILY_API_KEY: optionalString,
 
+  // OpenBao proof fixture - Optional
+  // Used by validation to prove OpenBao -> ESO -> pod env delivery without
+  // exposing the secret value.
+  OPENBAO_PROOF_DUMMY_SECRET: optionalString,
+
   // Market Provider: Kalshi - Optional
   // Required for Kalshi market data in poly-brain. Polymarket works without credentials.
   KALSHI_API_KEY: optionalString,
