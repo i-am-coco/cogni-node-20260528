@@ -25,6 +25,9 @@ patches:
       - op: replace
         path: /data/IMAGE_DIGEST
         value: "candidate-a-placeholder-scheduler-worker"
+      - op: replace
+        path: /data/COGNI_NODE_ENDPOINTS
+        value: "operator=http://node-app:3000,node-template=http://node-app:3000,4ff8eac1-4eba-4ed0-931b-b1fe4f64713d=http://node-app:3000"
 
   # bug.0295: VM discovery via DNS (candidate-a.cogni-node-20260528-candidate-a.vm.opencompany.cc).
   # Convert base headless Services → ExternalName; delete EndpointSlices.
