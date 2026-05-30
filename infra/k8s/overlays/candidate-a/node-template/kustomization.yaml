@@ -5,7 +5,7 @@
 # ../../_template/node-template/. This file declares ONLY the env-specific
 # parts: namespace, image tag, TEMPORAL_NAMESPACE.
 #
-# ExternalName host (`vm.cognidao.org`) inherits from the shared template;
+# ExternalName host (`cogni-node-20260528-candidate-a.vm.opencompany.cc`) inherits from the shared template;
 # provision-env-vm.sh Phase 4c sed-rewrites to `<env>.vm.<FORK_DOMAIN_ROOT>`
 # on the deploy branch before Argo CD picks it up.
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -19,14 +19,14 @@ resources:
 images:
   - name: ghcr.io/cogni-dao/cogni-node-template
     newName: ghcr.io/cogni-dao/cogni-node-template
-    newTag: "candidate-a-placeholder-node-template"
+    newTag: "pr-46-d638ff639532c6876a57af3338a8086793e2203f-node-template"
   # Migrator stage — separate GHCR package per bug.0344. Init container in
   # the base Deployment references this image. Placeholder is sed-rewritten
   # by provision-env-vm.sh Phase 4c (derives migrator boot tag from
   # bootstrap_image_tag + migrator_tag_suffix).
   - name: ghcr.io/cogni-dao/cogni-node-template-migrate
     newName: ghcr.io/cogni-dao/cogni-node-template-migrate
-    newTag: "candidate-a-placeholder-node-template-migrate"
+    newTag: "pr-46-d638ff639532c6876a57af3338a8086793e2203f-node-template-migrate"
 
 patches:
   - target:

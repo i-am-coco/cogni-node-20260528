@@ -4,7 +4,7 @@
 # Shared overlay structure for the node-template app. Each per-env overlay
 # (infra/k8s/overlays/<env>/node-template/) references this directory for
 # the env-agnostic parts: NodePort, EndpointSlice deletions, and a
-# placeholder ExternalName host (`vm.cognidao.org`) that provision-env-vm.sh
+# placeholder ExternalName host (`cogni-node-20260528-candidate-a.vm.opencompany.cc`) that provision-env-vm.sh
 # rewrites to `<env>.vm.<FORK_DOMAIN_ROOT>` per deploy branch.
 #
 # Per-env wrappers add ONLY:
@@ -32,7 +32,7 @@ patches:
         value: 30000
 
   # bug.0295: VM discovery via DNS. ExternalName host below is a placeholder
-  # (`vm.cognidao.org`) that provision-env-vm.sh Phase 4c sed-rewrites to
+  # (`cogni-node-20260528-candidate-a.vm.opencompany.cc`) that provision-env-vm.sh Phase 4c sed-rewrites to
   # the env-specific host per deploy branch (e.g. `candidate-a.vm.opencompany.cc`).
   # Each Service patch converts the base headless Service → ExternalName;
   # paired EndpointSlice patches delete the static-IP fallback.
@@ -44,7 +44,7 @@ patches:
         name: postgres-external
       spec:
         type: ExternalName
-        externalName: vm.cognidao.org
+        externalName: cogni-node-20260528-candidate-a.vm.opencompany.cc
         clusterIP: null
   - target: { kind: Service, name: temporal-external }
     patch: |
@@ -54,7 +54,7 @@ patches:
         name: temporal-external
       spec:
         type: ExternalName
-        externalName: vm.cognidao.org
+        externalName: cogni-node-20260528-candidate-a.vm.opencompany.cc
         clusterIP: null
   - target: { kind: Service, name: litellm-external }
     patch: |
@@ -64,7 +64,7 @@ patches:
         name: litellm-external
       spec:
         type: ExternalName
-        externalName: vm.cognidao.org
+        externalName: cogni-node-20260528-candidate-a.vm.opencompany.cc
         clusterIP: null
   - target: { kind: Service, name: doltgres-external }
     patch: |
@@ -74,7 +74,7 @@ patches:
         name: doltgres-external
       spec:
         type: ExternalName
-        externalName: vm.cognidao.org
+        externalName: cogni-node-20260528-candidate-a.vm.opencompany.cc
         clusterIP: null
   - target: { kind: Service, name: redis-external }
     patch: |
@@ -84,7 +84,7 @@ patches:
         name: redis-external
       spec:
         type: ExternalName
-        externalName: vm.cognidao.org
+        externalName: cogni-node-20260528-candidate-a.vm.opencompany.cc
         clusterIP: null
   - target: { kind: EndpointSlice, name: postgres-external-1 }
     patch: |
